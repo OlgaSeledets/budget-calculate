@@ -14,15 +14,52 @@ const additionalExpensesValue = document.querySelector('.additional_expenses-val
 const incomePeriodValue = document.querySelector('.income_period-value');
 const targetMonthValue = document.querySelector('.target_month-value');
 const salaryAmount = document.querySelector('.salary-amount');
-const incomeTitle = document.querySelector('.income-title');
+const incomeTitle = document.querySelector('div.income-items input.income-title');
 const incomeAmount = document.querySelector('.income-amount');
-const expensesTitle = document.querySelector('.expenses-title');
+const expensesTitle = document.querySelector('div.expenses-items input.expenses-title');
+const expensesAmount = document.querySelector('.expenses-amount');
 let expensesItems = document.querySelectorAll('.expenses-items');
 const additionalExpensesItem = document.querySelector('.additional_expenses-item');
 const targetAmount = document.querySelector('.target-amount');
 const periodSelect = document.querySelector('.period-select');
-let incomeItem = document.querySelectorAll('.income-items');
+let incomeItems = document.querySelectorAll('.income-items');
 let periodAmount = document.querySelector('.period-amount');
+
+expensesAmount.addEventListener('keydown', function(event) {
+    const key = event.key
+    if (!key.match(/\d/) && key !== 'Backspace')
+        event.preventDefault()
+})
+
+expensesTitle.addEventListener('keydown', function(event) {
+    const key = event.key
+    if (!key.match(/[а-яА-ЯёЁ]/) && key !== 'Backspace')
+        event.preventDefault()
+})
+
+incomeAmount.addEventListener('keydown', function(event) {
+    const key = event.key
+    if (!key.match(/\d/) && key !== 'Backspace')
+        event.preventDefault()
+})
+
+incomeTitle.addEventListener('keydown', function(event) {
+    const key = event.key
+    if (!key.match(/[а-яА-ЯёЁ]/) && key !== 'Backspace')
+        event.preventDefault()
+})
+
+salaryAmount.addEventListener('keydown', function(event) {
+    const key = event.key
+    if (!key.match(/\d/) && key !== 'Backspace')
+        event.preventDefault()
+})
+
+targetAmount.addEventListener('keydown', function(event) {
+    const key = event.key
+    if (!key.match(/\d/) && key !== 'Backspace')
+        event.preventDefault()
+})
 
 let isNumber = function(n) {
     return !isNaN(parseFloat(n)) && isFinite(n)
@@ -77,11 +114,11 @@ let appData = {
         }
     },
     addIncomeBlock: function() {
-        let cloneIncomeItem = incomeItem[0].cloneNode(true);
-        incomeItem[0].parentNode.insertBefore(cloneIncomeItem, incomePlus);
-        incomeItem = document.querySelectorAll('.income-items');
+        let cloneIncomeItem = incomeItems[0].cloneNode(true);
+        incomeItems[0].parentNode.insertBefore(cloneIncomeItem, incomePlus);
+        incomeItems = document.querySelectorAll('.income-items');
 
-        if (incomeItem.length === 3) {
+        if (incomeItems.length === 3) {
             incomePlus.style.display = 'none';
         }
     },
@@ -89,13 +126,16 @@ let appData = {
         expensesItems.forEach(function(item) {
             let itemExpenses = item.querySelector('.expenses-title').value;
             let cashExpenses = item.querySelector('.expenses-amount').value;
+            let checkNum = /[-\.;,":'a-zA-Zа-яА-Я]/;
+            let checkStr = /[0-9]/;
+
             if (itemExpenses !== '' && cashExpenses !== '') {
                 appData.expenses[itemExpenses] = cashExpenses;
             }
         });
     },
     getIncome: function() {
-        incomeItem.forEach(function(item) {
+        incomeItems.forEach(function(item) {
             let itemIncome = item.querySelector('.income-title').value;
             let cashIncome = item.querySelector('.income-amount').value;
             if (itemIncome !== '' && cashIncome !== '') {
