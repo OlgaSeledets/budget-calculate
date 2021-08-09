@@ -1,11 +1,14 @@
 'use strict'
 
 const start = document.getElementById('start');
+const cancel = document.getElementById('cancel');
 const btnPlus = document.getElementsByTagName('button');
 const incomePlus = btnPlus[0];
 const expensesPlus = btnPlus[1];
 const depositCheck = document.querySelector('#deposit-check');
 const additionalIncomeItem = document.querySelectorAll('.additional_income-item');
+const additionalTitle = document.querySelector('div.additional_income input.additional_title');
+const additionalAmount = document.querySelector('div.additional_income input.additional_amount');
 const budgetMonthValue = document.querySelector('.budget_month-value');
 const budgetDayValue = document.querySelector('.budget_day-value');
 const expensesMonthValue = document.querySelector('.expenses_month-value');
@@ -33,7 +36,7 @@ expensesAmount.addEventListener('keydown', function(event) {
 
 expensesTitle.addEventListener('keydown', function(event) {
     const key = event.key
-    if (!key.match(/[а-яА-ЯёЁ]/) && key !== 'Backspace')
+    if (!key.match(/[,а-яА-ЯёЁ\s]/) && key !== 'Backspace')
         event.preventDefault()
 })
 
@@ -45,7 +48,7 @@ incomeAmount.addEventListener('keydown', function(event) {
 
 incomeTitle.addEventListener('keydown', function(event) {
     const key = event.key
-    if (!key.match(/[а-яА-ЯёЁ]/) && key !== 'Backspace')
+    if (!key.match(/[,а-яА-ЯёЁ\s]/) && key !== 'Backspace')
         event.preventDefault()
 })
 
@@ -61,11 +64,29 @@ targetAmount.addEventListener('keydown', function(event) {
         event.preventDefault()
 })
 
+additionalAmount.addEventListener('keydown', function(event) {
+    const key = event.key
+    if (!key.match(/\d/) && key !== 'Backspace')
+        event.preventDefault()
+})
+
+additionalTitle.addEventListener('keydown', function(event) {
+    const key = event.key
+    if (!key.match(/[,а-яА-ЯёЁ\s]/) && key !== 'Backspace')
+        event.preventDefault()
+})
+
+additionalExpensesItem.addEventListener('keydown', function(event) {
+    const key = event.key
+    if (!key.match(/[,а-яА-ЯёЁ\s]/) && key !== 'Backspace')
+        event.preventDefault()
+})
+
 let isNumber = function(n) {
     return !isNaN(parseFloat(n)) && isFinite(n)
 };
 
-let appData = {
+const appData = {
     income: {},
     incomeMonth: 0,
     addIncome: [],
@@ -96,11 +117,11 @@ let appData = {
         appData.showResult();
     },
     showResult: function() {
-        budgetMonthValue.value = appData.budgetMonth;
-        budgetDayValue.value = appData.budgetDay;
-        expensesMonthValue.value = appData.expensesMonth;
-        additionalExpensesValue.value = appData.addExpenses.join(', ');
-        additionalIncomeValue.value = appData.addIncome.join(', ');
+        budgetMonthValue.value = this.budgetMonth;
+        budgetDayValue.value = this.budgetDay;
+        expensesMonthValue.value = this.expensesMonth;
+        additionalExpensesValue.value = this.addExpenses.join(', ');
+        additionalIncomeValue.value = this.addIncome.join(', ');
         targetMonthValue.value = Math.ceil(appData.getTargetMonth());
         incomePeriodValue.value = appData.calcPeriod();
     },
@@ -126,8 +147,6 @@ let appData = {
         expensesItems.forEach(function(item) {
             let itemExpenses = item.querySelector('.expenses-title').value;
             let cashExpenses = item.querySelector('.expenses-amount').value;
-            let checkNum = /[-\.;,":'a-zA-Zа-яА-Я]/;
-            let checkStr = /[0-9]/;
 
             if (itemExpenses !== '' && cashExpenses !== '') {
                 appData.expenses[itemExpenses] = cashExpenses;
@@ -142,8 +161,8 @@ let appData = {
                 appData.income[itemIncome] = cashIncome;
             }
         });
-        for (let key in appData.income) {
-            appData.incomeMonth += +appData.income[key];
+        for (let key in this.income) {
+            this.incomeMonth += +this.income[key];
         }
     },
     getAddExpenses: function() {
@@ -165,8 +184,8 @@ let appData = {
     },
             
     getExpensesMonth: function() {
-        for (let key in appData.expenses) {
-            appData.expensesMonth += +appData.expenses[key];
+        for (let key in this.expenses) {
+            this.expensesMonth += +this.expenses[key];
        }
     },
 
@@ -176,15 +195,15 @@ let appData = {
     },
 
     getTargetMonth: function() {
-        return (targetAmount.value / appData.budgetMonth);
+        return (targetAmount.value / this.budgetMonth);
     }, 
 
     getStatusIncome: function() {
-        if (appData.budgetDay >= 1200) {
+        if (this.budgetDay >= 1200) {
             return ('У вас высокий уровень дохода');
-        } else if (appData.budgetDay >= 600 && appData.budgetDay < 1200) {
+        } else if (this.budgetDay >= 600 && this.budgetDay < 1200) {
             return ('У вас средний уровень дохода');
-        } else if (appData.budgetDay > 0 && appData.budgetDay < 600) {
+        } else if (this.budgetDay > 0 && this.budgetDay < 600) {
             return ('К сожалению, у вас уровень дохода ниже среднего');
         } else {
             return ('Что-то пошло не так');
@@ -200,11 +219,11 @@ let appData = {
     },
 
     calcPeriod: function() {
-        return appData.budgetMonth * periodSelect.value;
+        return this.budgetMonth * periodSelect.value;
     }
 };
 
-start.addEventListener('click', appData.start)
+start.addEventListener('click', appData.start.bind(appData));
 
 expensesPlus.addEventListener('click', appData.addExpensesBlock);
 
